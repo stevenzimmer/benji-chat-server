@@ -42,7 +42,9 @@ app.post("/", (req, res) => {
                 }
             });
 
-        return res.status(200).send("Message Sent!");
+        return res
+            .status(200)
+            .send({ data: { message, sender, type, members } });
     }
 
     return res.status(200).send("Not a new message request");
