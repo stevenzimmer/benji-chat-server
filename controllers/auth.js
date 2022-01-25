@@ -85,4 +85,77 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { register, login };
+const verify = async (req, res) => {
+    const { username, phoneNumber } = req.body;
+
+    console.log({ username });
+    console.log({ phoneNumber });
+
+    const client = StreamChat.getInstance(api_key, api_secret);
+
+    const { users } = await client.queryUsers({
+        name: username,
+        phoneNumber: phoneNumber.toString(),
+    });
+
+    console.log({ users });
+
+    if (!users.length) {
+        return res.status(500).json({
+            message: "No user found with that username or Phone number",
+        });
+    } else {
+        return res.status(200).json({
+            username: users[0].name,
+            fullName: users[0].fullName,
+            userId: users[0].id,
+            resetPassword: true,
+        });
+    }
+};
+
+const reset = async (req, res) => {
+    const { newPassword, userId } = req.body;
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    console.log({ hashedPassword });
+    console.log({ userId });
+
+    const client = StreamChat.getInstance(api_key, api_secret);
+
+    const updateResponse = await client.partialUpdateUser({
+        id: userId,
+        set: {
+            hashedPassword,
+        },
+    });
+
+    console.log({ updateResponse });
+
+    // const client = StreamChat.getInstance(api_key, api_secret);
+
+    // const { users } = await client.queryUsers({
+    //     name: username,
+    //     phoneNumber: phoneNumber.toString(),
+    // });
+
+    // console.log({ users });
+
+    // if (!users.length) {
+    //     return res.status(500).json({
+    //         message: "No user found with that username or Phone number",
+    //     });
+    // } else {
+    //     return res.status(200).json({
+    //         username: users[0].name,
+    //         fullName: users[0].fullName,
+    //         userId: users[0].id,
+    //         resetPassword: true,
+    //     });
+    // }
+
+    return res.status(200).json({ updateResponse });
+};
+
+module.exports = { register, login, verify, reset };

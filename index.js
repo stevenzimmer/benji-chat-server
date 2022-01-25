@@ -37,8 +37,8 @@ app.post("/", (req, res) => {
                             messagingServiceSid,
                             to: user.phoneNumber,
                         })
-                        .then(() => console.log("message sent"))
-                        .catch((err) => console.log(err));
+                        .then((messageData) => console.log({ messageData }))
+                        .catch((err) => console.log({ err }));
                 }
             });
 
@@ -46,6 +46,11 @@ app.post("/", (req, res) => {
             .status(200)
             .send({ data: { message, sender, type, members } });
     }
+
+    console.log({ messge });
+    console.log({ sender });
+    console.log({ type });
+    console.log({ memebers });
 
     return res.status(200).send("Not a new message request");
 });
