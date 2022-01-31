@@ -23,11 +23,23 @@ const register = async (req, res) => {
         if (!users.length) {
             const userId = crypto.randomBytes(16).toString("hex");
 
-            const serverClient = connect(api_key, api_secret, stream_app_id);
+            const serverClient = await connect(
+                api_key,
+                api_secret,
+                stream_app_id
+            );
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            const token = serverClient.createUserToken(userId);
+            const token = await serverClient.createUserToken(userId);
+
+            // console.log({ fullName });
+            // console.log({ username });
+            // console.log({ password });
+            // console.log({ phoneNumber });
+            // console.log({ hashedPassword });
+            // console.log({ userId });
+            // console.log({ token });
 
             res.status(200).json({
                 token,
@@ -77,7 +89,9 @@ const login = async (req, res) => {
                 hashedPassword: users[0].hashedPassword,
             });
         } else {
-            res.status(500).json({ message: "Incorrect password" });
+            res.status(500).json({
+                message: "Incorrect username and/or password",
+            });
         }
     } catch (err) {
         console.log(err);
